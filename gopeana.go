@@ -1,6 +1,3 @@
-// Package gopeana provides an Europeana Search API client.
-// API docs: https://pro.europeana.eu/resources/apis/search
-// Inspired by https://github.com/nishanths/go-xkcd/
 package gopeana
 
 import (
