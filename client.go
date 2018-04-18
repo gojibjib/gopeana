@@ -5,13 +5,17 @@ import (
 	"net/http"
 )
 
+// Client is a wrapper for  the standard HTTP client, with additional parameters
 type Client struct {
 	HTTPClient *http.Client
 	Config
-	ApiKey     string
+	APIKey     string
 	PrivateKey string
 }
 
+// NewClient returns a pointer to a client struct.
+//
+// APIKey should always be provided, whereas PrivateKey is optional for most standard requests.
 func NewClient(apiKey, privateKey string) *Client {
 	return &Client{
 		http.DefaultClient,
@@ -23,8 +27,8 @@ func NewClient(apiKey, privateKey string) *Client {
 	}
 }
 
-// baseUrl joins a constant url string with the client's API key and returns it as a string.
-func (c *Client) baseUrl() string {
+// baseURL joins a constant url string with the client's API key and returns it as a string.
+func (c *Client) baseURL() string {
 	var protocol string
 	const url = "www.europeana.eu/api/v2/search.json"
 
@@ -34,7 +38,7 @@ func (c *Client) baseUrl() string {
 		protocol = "http://"
 	}
 
-	return protocol + url + "?wskey=" + c.ApiKey
+	return protocol + url + "?wskey=" + c.APIKey
 }
 
 // do performs a basic HTTP request and returns the body.

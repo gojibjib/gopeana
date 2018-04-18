@@ -1,4 +1,4 @@
-// Europeana Search API client.
+// Package gopeana provides an Europeana Search API client.
 // API docs: https://pro.europeana.eu/resources/apis/search
 // Inspired by https://github.com/nishanths/go-xkcd/
 package gopeana
@@ -9,10 +9,10 @@ import (
 	"net/http"
 )
 
-// Item describes 'rich' metadatada set described at
+// Item describes 'rich' metadata set described at
 // https://pro.europeana.eu/resources/apis/search#profile-rich
 type Item struct {
-	Id                   string                `json:"id"`
+	ID                   string                `json:"id"`
 	Title                []string              `json:"title"`
 	TitleLang            map[string][]string   `json:"dcTitleLangAware"`
 	Description          []string              `json:"dcDescription"`
@@ -64,7 +64,7 @@ type Response struct {
 // This will also close the body.
 func (r *SearchRequest) doSearchRequest(query string) (Response, error) {
 	var resp Response
-	requestString := r.searchUrl() + "&query=" + query
+	requestString := r.searchURL() + "&query=" + query
 
 	log.Printf("Sending: GET %s", requestString)
 

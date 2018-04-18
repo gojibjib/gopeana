@@ -1,7 +1,6 @@
 package gopeana
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -10,7 +9,6 @@ import (
 // as Reusability, Profile and Rows/Start for basic Pagination.
 // You can pass an empty string to rows, profile or start to use the API default values
 // rows = "" will return 12 results, start = "" will start with item 1, profile = "" will use standard profile.
-
 type SearchRequest struct {
 	Client      *Client
 	Reusability string
@@ -31,8 +29,8 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 				return true, nil
 			}
 		}
-		return false, errors.New(fmt.Sprintf("%s not part of valid arguments: %v",
-			reusability, validReusability))
+		return false, fmt.Errorf("%s not part of valid arguments: %v",
+			reusability, validReusability)
 	}()
 	if err != nil {
 		return request, err
@@ -45,8 +43,8 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 				return true, nil
 			}
 		}
-		return false, errors.New(fmt.Sprintf("%s not part of valid arguments: %s",
-			profile, validProfile))
+		return false, fmt.Errorf("%s not part of valid arguments: %s",
+			profile, validProfile)
 	}()
 	if err != nil {
 		return request, err
@@ -58,7 +56,7 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 			return request, err
 		}
 		if check < 0 {
-			return request, errors.New("rows can't be < 0")
+			return request, fmt.Errorf("rows can't be < 0")
 		}
 	}
 
@@ -68,7 +66,7 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 			return request, err
 		}
 		if check < 1 {
-			return request, errors.New("start can't be < 1")
+			return request, fmt.Errorf("start can't be < 1")
 		}
 	}
 
@@ -82,8 +80,8 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 }
 
 // searchUrl will use the struct's fields to construct a search URL and return it as string
-func (r *SearchRequest) searchUrl() string {
-	url := r.Client.baseUrl()
+func (r *SearchRequest) searchURL() string {
+	url := r.Client.baseURL()
 
 	if r.Reusability != "" {
 		url += "&reusability=" + r.Reusability
