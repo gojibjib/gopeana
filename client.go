@@ -1,10 +1,6 @@
-// Europeana API wrapper
-// https://pro.europeana.eu/resources/apis/search
-// Inspired by https://github.com/nishanths/go-xkcd/
 package gopeana
 
 import (
-	_ "fmt"
 	"io"
 	"net/http"
 )
@@ -12,20 +8,22 @@ import (
 type Client struct {
 	HTTPClient *http.Client
 	Config
-	apiKey string
+	ApiKey     string
+	PrivateKey string
 }
 
-func NewClient(apiKey string) *Client {
+func NewClient(apiKey, privateKey string) *Client {
 	return &Client{
 		http.DefaultClient,
 		Config{
 			true,
 		},
 		apiKey,
+		privateKey,
 	}
 }
 
-// baseUrl joins a constant url string with the client's API key and returns it as a string
+// baseUrl joins a constant url string with the client's API key and returns it as a string.
 func (c *Client) baseUrl() string {
 	var protocol string
 	const url = "www.europeana.eu/api/v2/search.json"
@@ -36,11 +34,11 @@ func (c *Client) baseUrl() string {
 		protocol = "http://"
 	}
 
-	return protocol + url + "?wskey=" + c.apiKey
+	return protocol + url + "?wskey=" + c.ApiKey
 }
 
-// do performs a basic HTTP request and returns the body
-// User needs to make sure client is closed again
+// do performs a basic HTTP request and returns the body.
+// User needs to make sure client is closed again.
 func (c *Client) do(req *http.Request) (io.ReadCloser, error) {
 	res, err := c.HTTPClient.Do(req)
 

@@ -6,6 +6,11 @@ import (
 	"strconv"
 )
 
+// SearchRequest is a wrapper around an Europeana API Search request, defining fields such
+// as Reusability, Profile and Rows/Start for basic Pagination.
+// You can pass an empty string to rows, profile or start to use the API default values
+// rows = "" will return 12 results, start = "" will start with item 1, profile = "" will use standard profile.
+
 type SearchRequest struct {
 	Client      *Client
 	Reusability string
@@ -14,6 +19,8 @@ type SearchRequest struct {
 	Start       string
 }
 
+// NewRequest returns a pointer to a SearchRequest struct. This function will also perform error checking
+// and return an error if an invalid value has been provided.
 func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchRequest, error) {
 	var request *SearchRequest
 
@@ -24,14 +31,14 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 				return true, nil
 			}
 		}
-		return false, errors.New(fmt.Sprintf("%s not part of valid arguments: %s",
+		return false, errors.New(fmt.Sprintf("%s not part of valid arguments: %v",
 			reusability, validReusability))
 	}()
 	if err != nil {
 		return request, err
 	}
 
-	validProfile := []string{"", "minimal"}
+	validProfile := []string{"", "minimal", "standard", "rich"}
 	_, err = func() (bool, error) {
 		for _, v := range validProfile {
 			if profile == v {
@@ -43,10 +50,6 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 	}()
 	if err != nil {
 		return request, err
-	}
-	// Right now only minimal profile is supported
-	if profile == "" {
-		profile = "minimal"
 	}
 
 	if rows != "" {
@@ -78,6 +81,7 @@ func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchReq
 	}, nil
 }
 
+// searchUrl will use the struct's fields to construct a search URL and return it as string
 func (r *SearchRequest) searchUrl() string {
 	url := r.Client.baseUrl()
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// for error responses from the Europeana API endpoint.
+// StatusError is used for error responses from the Europeana API endpoint.
 type StatusError struct {
 	StatusCode int
 	StatusText string
