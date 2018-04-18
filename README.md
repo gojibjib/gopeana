@@ -1,4 +1,5 @@
-# Gopeana - An Europeana Search API client written in Go
+# [gopeana](https://github.com/gojibjib/gopeana)
+An Europeana Search API client written in Go
 
 [Europeana](https://www.europeana.eu) is a European collection of over 50 million digitised items.
 The [Search API](https://pro.europeana.eu/resources/apis/search) provides a programmatic way to access those resources.
