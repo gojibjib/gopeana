@@ -10,7 +10,7 @@ import (
 // You can pass an empty string to rows, profile or start to use the API default values
 // rows = "" will return 12 results, start = "" will start with item 1, profile = "" will use standard profile.
 type SearchRequest struct {
-	Client      *Client
+	*Client
 	reusability string
 	profile     string
 	rows        string
