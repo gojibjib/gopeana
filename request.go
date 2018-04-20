@@ -6,15 +6,15 @@ import (
 )
 
 // SearchRequest is a wrapper around an Europeana API Search request, defining fields such
-// as Reusability, Profile and Rows/Start for basic Pagination.
+// as reusability, profile and rows/start for basic Pagination.
 // You can pass an empty string to rows, profile or start to use the API default values
 // rows = "" will return 12 results, start = "" will start with item 1, profile = "" will use standard profile.
 type SearchRequest struct {
 	Client      *Client
-	Reusability string
-	Profile     string
-	Rows        string
-	Start       string
+	reusability string
+	profile     string
+	rows        string
+	start       string
 }
 
 // NewRequest returns a pointer to a SearchRequest struct. This function will also perform error checking
@@ -22,82 +22,131 @@ type SearchRequest struct {
 func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchRequest, error) {
 	var request *SearchRequest
 
-	validReusability := []string{"", "open", "restricted", "permission"}
-	_, err := func() (bool, error) {
-		for _, v := range validReusability {
-			if reusability == v {
-				return true, nil
-			}
-		}
-		return false, fmt.Errorf("%s not part of valid arguments: %v",
-			reusability, validReusability)
-	}()
-	if err != nil {
+	if err := checkReusability(reusability); err != nil {
 		return request, err
 	}
 
-	validProfile := []string{"", "minimal", "standard", "rich"}
-	_, err = func() (bool, error) {
-		for _, v := range validProfile {
-			if profile == v {
-				return true, nil
-			}
-		}
-		return false, fmt.Errorf("%s not part of valid arguments: %s",
-			profile, validProfile)
-	}()
-	if err != nil {
+	if err := checkProfile(profile); err != nil {
 		return request, err
 	}
 
-	if rows != "" {
-		check, err := strconv.Atoi(rows)
-		if err != nil {
-			return request, err
-		}
-		if check < 0 {
-			return request, fmt.Errorf("rows can't be < 0")
-		}
+	if err := checkPagination(rows, "rows can't be < 0", 0); err != nil {
+		return request, err
 	}
 
-	if start != "" {
-		check, err := strconv.Atoi(start)
-		if err != nil {
-			return request, err
-		}
-		if check < 1 {
-			return request, fmt.Errorf("start can't be < 1")
-		}
+	if err := checkPagination(start, "start can't be < 1", 1); err != nil {
+		return request, err
 	}
 
 	return &SearchRequest{
 		Client:      c,
-		Reusability: reusability,
-		Profile:     profile,
-		Rows:        rows,
-		Start:       start,
+		reusability: reusability,
+		profile:     profile,
+		rows:        rows,
+		start:       start,
 	}, nil
+}
+
+// checkReusability will perform input validation for the reusability field
+func checkReusability(s string) error {
+	validReusability := []string{"", "open", "restricted", "permission"}
+	for _, v := range validReusability {
+		if s == v {
+			return nil
+		}
+	}
+	return fmt.Errorf("%s not part of valid arguments: %v",
+		s, validReusability)
+}
+
+// checkProfile will perform input validation for the profile field
+func checkProfile(s string) error {
+	validProfile := []string{"", "minimal", "standard", "rich"}
+	for _, v := range validProfile {
+		if s == v {
+			return nil
+		}
+	}
+	return fmt.Errorf("%s not part of valid arguments: %s",
+		s, validProfile)
+}
+
+// checkReusability will will take a string check and try to convert it to an integer.
+// If conversion fails or the converted value is smaller than a passed integer val,
+// will return a custom error string passed as the info parameter.
+// This function can be used to validate inputs for the rows and start field
+func checkPagination(check, info string, val int) error {
+	if check != "" {
+		check, err := strconv.Atoi(check)
+		if err != nil {
+			return err
+		}
+		if check < val {
+			return fmt.Errorf("%s", info)
+		}
+	}
+	return nil
 }
 
 // searchUrl will use the struct's fields to construct a search URL and return it as string
 func (r *SearchRequest) searchURL() string {
 	url := r.Client.baseURL()
 
-	if r.Reusability != "" {
-		url += "&reusability=" + r.Reusability
+	if r.reusability != "" {
+		url += "&reusability=" + r.reusability
 	}
 
-	if r.Profile != "" {
-		url += "&profile=" + r.Profile
+	if r.profile != "" {
+		url += "&profile=" + r.profile
 	}
 
-	if r.Rows != "" {
-		url += "&rows=" + r.Rows
+	if r.rows != "" {
+		url += "&rows=" + r.rows
 	}
 
-	if r.Start != "" {
-		url += "&start=" + r.Start
+	if r.start != "" {
+		url += "&start=" + r.start
 	}
 
 	return url
+}
+
+// Reusability will set the reusability field or return an error
+func (r *SearchRequest) Reusability(s string) error {
+	if err := checkReusability(s); err != nil {
+		r.reusability = s
+		return nil
+	} else {
+		return err
+	}
+}
+
+// Reusability will set the profile or return an error
+func (r *SearchRequest) Profile(s string) error {
+	if err := checkProfile(s); err != nil {
+		r.profile = s
+		return nil
+	} else {
+		return err
+	}
+}
+
+// Reusability will set the rows field or return an error
+func (r *SearchRequest) Rows(s string) error {
+	if err := checkPagination(s, "rows can't be < 0", 0); err != nil {
+		r.profile = s
+		return nil
+	} else {
+		return err
+	}
+}
+
+// Reusability will set the start field or return an error
+func (r *SearchRequest) Start(s string) error {
+	if err := checkPagination(s, "start can't be < 0", 1); err != nil {
+		r.profile = s
+		return nil
+	} else {
+		return err
+	}
 }
