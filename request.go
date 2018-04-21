@@ -71,7 +71,7 @@ func checkProfile(s string) error {
 		s, validProfile)
 }
 
-// checkReusability will will take a string check and try to convert it to an integer.
+// checkPagination will will take a string check and try to convert it to an integer.
 // If conversion fails or the converted value is smaller than a passed integer val,
 // will return a custom error string passed as the info parameter.
 // This function can be used to validate inputs for the rows and start field
