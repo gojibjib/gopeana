@@ -22,7 +22,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/obitech/gopeana"
+	"github.com/gojibjib/gopeana"
 	"log"
 )
 
