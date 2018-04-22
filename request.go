@@ -17,9 +17,9 @@ type SearchRequest struct {
 	start       string
 }
 
-// NewRequest returns a pointer to a SearchRequest struct. This function will also perform error checking
+// NewSearchRequest returns a pointer to a SearchRequest struct. This function will also perform error checking
 // and return an error if an invalid value has been provided.
-func NewRequest(c *Client, reusability, profile, rows, start string) (*SearchRequest, error) {
+func NewSearchRequest(c *Client, reusability, profile, rows, start string) (*SearchRequest, error) {
 	var request *SearchRequest
 
 	if err := checkReusability(reusability); err != nil {
@@ -84,6 +84,7 @@ func checkPagination(check, info string, val int) error {
 		if check < val {
 			return fmt.Errorf("%s", info)
 		}
+		return nil
 	}
 	return nil
 }
@@ -114,39 +115,39 @@ func (r *SearchRequest) searchURL() string {
 // Reusability will set the reusability field or return an error
 func (r *SearchRequest) Reusability(s string) error {
 	if err := checkReusability(s); err != nil {
+		return err
+	} else {
 		r.reusability = s
 		return nil
-	} else {
-		return err
 	}
 }
 
-// Reusability will set the profile or return an error
+// Reusability will set the profile field or return an error
 func (r *SearchRequest) Profile(s string) error {
 	if err := checkProfile(s); err != nil {
+		return err
+	} else {
 		r.profile = s
 		return nil
-	} else {
-		return err
 	}
 }
 
 // Reusability will set the rows field or return an error
 func (r *SearchRequest) Rows(s string) error {
 	if err := checkPagination(s, "rows can't be < 0", 0); err != nil {
+		return err
+	} else {
 		r.profile = s
 		return nil
-	} else {
-		return err
 	}
 }
 
 // Reusability will set the start field or return an error
 func (r *SearchRequest) Start(s string) error {
-	if err := checkPagination(s, "start can't be < 0", 1); err != nil {
+	if err := checkPagination(s, "start can't be < 1", 1); err != nil {
+		return err
+	} else {
 		r.profile = s
 		return nil
-	} else {
-		return err
 	}
 }
