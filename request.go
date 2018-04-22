@@ -116,38 +116,36 @@ func (r *SearchRequest) searchURL() string {
 func (r *SearchRequest) Reusability(s string) error {
 	if err := checkReusability(s); err != nil {
 		return err
-	} else {
-		r.reusability = s
-		return nil
 	}
+
+	r.reusability = s
+	return nil
 }
 
-// Reusability will set the profile field or return an error
+// Profile will set the profile field or return an error
 func (r *SearchRequest) Profile(s string) error {
 	if err := checkProfile(s); err != nil {
 		return err
-	} else {
-		r.profile = s
-		return nil
 	}
+	r.profile = s
+	return nil
 }
 
-// Reusability will set the rows field or return an error
+// Rows will set the rows field or return an error
 func (r *SearchRequest) Rows(s string) error {
 	if err := checkPagination(s, "rows can't be < 0", 0); err != nil {
 		return err
-	} else {
-		r.profile = s
-		return nil
 	}
+	r.profile = s
+	return nil
 }
 
-// Reusability will set the start field or return an error
+// Start will set the start field or return an error
 func (r *SearchRequest) Start(s string) error {
 	if err := checkPagination(s, "start can't be < 1", 1); err != nil {
 		return err
-	} else {
-		r.profile = s
-		return nil
 	}
+	r.profile = s
+	return nil
+
 }
