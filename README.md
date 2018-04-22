@@ -1,6 +1,7 @@
 # [gopeana](https://github.com/gojibjib/gopeana)
 [![godoc badge](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/gojibjib/gopeana)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gojibjib/gopeana)](https://goreportcard.com/report/github.com/gojibjib/gopeana)
+[![Build Status](https://travis-ci.org/gojibjib/gopeana.svg?branch=master)](https://travis-ci.org/gojibjib/gopeana)
 
 An Europeana Search API client written in Go
 
