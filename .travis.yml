@@ -6,4 +6,4 @@ install:
   - go get -d -v github.com/gojibjib/gopeana
 
 script:
-  - go test -v $GOPATH/src/github.com/gojibjib/gopeana
+  - go test -v gopath/src/github.com/gojibjib/gopeana
