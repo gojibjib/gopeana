@@ -154,7 +154,7 @@ func TestValidSearchURL(t *testing.T) {
 	})
 }
 
-func TestInvalidNewRequest(t *testing.T) {
+func TestInvalidNewBasicSearchRequest(t *testing.T) {
 	c := NewClient("abc", "")
 
 	t.Run("Invalid Reusability", func(t *testing.T) {
@@ -185,6 +185,26 @@ func TestInvalidNewRequest(t *testing.T) {
 		for _, v := range []string{"0", "-15", "test", "xkcd", "43.2"} {
 			if _, err := NewBasicSearchRequest(c, "", "", "", v); err == nil {
 				t.Errorf("error should have been thrown with rows = %s", v)
+			}
+		}
+	})
+}
+
+func TestInvalidNewCursorSearchRequest(t *testing.T) {
+	c := NewClient("abc", "")
+
+	t.Run("Invalid Reusability", func(t *testing.T) {
+		for _, v := range []string{"abcd", "42", "closed", "How are you"} {
+			if _, err := NewCursorSearchRequest(c, v, "", "*"); err == nil {
+				t.Errorf("error should have been thrown with reusability = %s", v)
+			}
+		}
+	})
+
+	t.Run("Invalid Profile", func(t *testing.T) {
+		for _, v := range []string{"abcd", "42", "open", "How are you", "open"} {
+			if _, err := NewCursorSearchRequest(c, "", v, "*"); err == nil {
+				t.Errorf("error should have been thrown with profile = %s", v)
 			}
 		}
 	})
