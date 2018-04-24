@@ -9,6 +9,7 @@ var validReusability = []string{"", "open", "restricted", "permission"}
 var validProfile = []string{"", "minimal", "standard", "rich"}
 var validRows = []string{"", "0", "1", "12", "24"}
 var validStart = []string{"", "1", "5", "18"}
+var validCursor = []string{"", "*", "123asd", "12as123sd"}
 var valiBasicRequests = []struct {
 	input []string
 	want  error
@@ -42,15 +43,15 @@ var validCursorRequests = []struct {
 	{[]string{"open", "minimal", "*"}, nil},
 }
 
-func assertURL(t *testing.T, c *Client, r *BasicSearchRequest, v, param string) {
+func assertURL(t *testing.T, c *Client, r Request, key, wantVal string) {
 	t.Helper()
 
 	got := r.searchURL()
 	want := ""
-	if v == "" {
+	if wantVal == "" {
 		want = c.baseURL()
 	} else {
-		want = fmt.Sprintf("%s&%s=%s", c.baseURL(), param, v)
+		want = fmt.Sprintf("%s&%s=%s", c.baseURL(), key, wantVal)
 	}
 	if got != want {
 		t.Errorf("got: %s, want: %s", got, want)
@@ -78,7 +79,7 @@ func TestValidNewRequest(t *testing.T) {
 
 }
 
-func TestValidSearchURL(t *testing.T) {
+func TestValidBasicSearchURL(t *testing.T) {
 	c := NewClient("abc", "")
 
 	t.Run("Basic URL", func(t *testing.T) {
@@ -99,7 +100,7 @@ func TestValidSearchURL(t *testing.T) {
 			if err != nil {
 				t.Errorf("%s", err)
 			}
-			assertURL(t, c, r, v, "reusability")
+			assertURL(t, c, r, "reusability", v)
 		}
 	})
 
@@ -109,7 +110,7 @@ func TestValidSearchURL(t *testing.T) {
 			if err != nil {
 				t.Errorf("%s", err)
 			}
-			assertURL(t, c, r, v, "profile")
+			assertURL(t, c, r, "profile", v)
 		}
 	})
 
@@ -119,7 +120,7 @@ func TestValidSearchURL(t *testing.T) {
 			if err != nil {
 				t.Errorf("%s", err)
 			}
-			assertURL(t, c, r, v, "rows")
+			assertURL(t, c, r, "rows", v)
 		}
 	})
 
@@ -129,7 +130,7 @@ func TestValidSearchURL(t *testing.T) {
 			if err != nil {
 				t.Errorf("%s", err)
 			}
-			assertURL(t, c, r, v, "start")
+			assertURL(t, c, r, "start", v)
 		}
 	})
 
@@ -147,6 +148,74 @@ func TestValidSearchURL(t *testing.T) {
 						if got != want {
 							t.Errorf("got: %s, want: %s", got, want)
 						}
+					}
+				}
+			}
+		}
+	})
+}
+
+func TestValidCursorSearchURL(t *testing.T) {
+	c := NewClient("abc", "")
+
+	t.Run("Basic URL", func(t *testing.T) {
+		req, err := NewCursorSearchRequest(c, "", "", "")
+		if err != nil {
+			t.Errorf("%s", err)
+		}
+		assertURL(t, c, req, "cursor", "*")
+	})
+
+	t.Run("With Reusability", func(t *testing.T) {
+		for _, v := range validReusability {
+			r, err := NewCursorSearchRequest(c, v, "", "")
+			if err != nil {
+				t.Errorf("%s", err)
+			}
+			got := r.searchURL()
+			want := ""
+			if v == "" {
+				want = fmt.Sprintf("%s&cursor=%s", c.baseURL(), "*")
+			} else {
+				want = fmt.Sprintf("%s&reusability=%s&cursor=%s", c.baseURL(), v, "*")
+			}
+			if got != want {
+				t.Errorf("got: %s, want: %s", got, want)
+			}
+		}
+	})
+
+	t.Run("With Profile", func(t *testing.T) {
+		for _, v := range validProfile {
+			r, err := NewCursorSearchRequest(c, "", v, "")
+			if err != nil {
+				t.Errorf("%s", err)
+			}
+			got := r.searchURL()
+			want := ""
+			if v == "" {
+				want = fmt.Sprintf("%s&cursor=%s", c.baseURL(), "*")
+			} else {
+				want = fmt.Sprintf("%s&profile=%s&cursor=%s", c.baseURL(), v, "*")
+			}
+			if got != want {
+				t.Errorf("got: %s, want: %s", got, want)
+			}
+		}
+	})
+
+	t.Run("Full URL", func(t *testing.T) {
+		for _, re := range validReusability[1:] {
+			for _, p := range validProfile[1:] {
+				for _, cu := range validCursor[1:] {
+					req, err := NewCursorSearchRequest(c, re, p, cu)
+					if err != nil {
+						t.Errorf("%s", err)
+					}
+					got := req.searchURL()
+					want := fmt.Sprintf("%s&reusability=%s&profile=%s&cursor=%s", c.baseURL(), re, p, cu)
+					if got != want {
+						t.Errorf("got: %s, want: %s", got, want)
 					}
 				}
 			}

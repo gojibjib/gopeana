@@ -5,50 +5,33 @@ import (
 	"strconv"
 )
 
+// Request defines each type that implements the Client and searchURL functions
+type Request interface {
+	searchURL() string
+	Client() *Client
+}
+
 // BasicSearchRequest is a wrapper around an Europeana API Search request, defining fields such
 // as reusability, profile and rows/start for basic Pagination.
 // You can pass an empty string to rows, profile or start to use the API default values
 // rows = "" will return 12 results, start = "" will start with item 1, profile = "" will use standard profile.
 type BasicSearchRequest struct {
-	*Client
+	client      *Client
 	reusability string
 	profile     string
 	rows        string
 	start       string
 }
 
+// CursorSearchRequest is a wrapper around an Europeana API Search request, defining fields such
+// as reusability, profile and rows/start for cursor-based Pagination. The first request should use cursor=*,
+// for following request the value of nextCursor needs to be used. If no cursor is returned anymore, results are
+// exhausted.
 type CursorSearchRequest struct {
-	*Client
+	client      *Client
 	reusability string
 	profile     string
 	cursor      string
-}
-
-// NewCursorSearchRequest returns a pointer to a CursorSearchRequest struct. This function will perform error checking
-// for the reusability and profile parameters, but not for cursor. If cursor argument is empty (""),
-// will use start cursor ("*")
-func NewCursorSearchRequest(c *Client, reusability, profile, cursor string) (*CursorSearchRequest, error) {
-	var req *CursorSearchRequest
-
-	if err := checkReusability(reusability); err != nil {
-		return req, err
-	}
-
-	if err := checkProfile(profile); err != nil {
-		return req, err
-	}
-
-	//
-	if cursor == "" {
-		cursor = "*"
-	}
-
-	return &CursorSearchRequest{
-		Client:      c,
-		reusability: reusability,
-		profile:     profile,
-		cursor:      cursor,
-	}, nil
 }
 
 // NewBasicSearchRequest returns a pointer to a BasicSearchRequest struct. This function will also perform error checking
@@ -73,12 +56,87 @@ func NewBasicSearchRequest(c *Client, reusability, profile, rows, start string) 
 	}
 
 	return &BasicSearchRequest{
-		Client:      c,
+		client:      c,
 		reusability: reusability,
 		profile:     profile,
 		rows:        rows,
 		start:       start,
 	}, nil
+}
+
+// Client returns a pointer to the client of said request
+func (r *BasicSearchRequest) Client() *Client {
+	return r.client
+}
+
+func (r *BasicSearchRequest) searchURL() string {
+	url := r.Client().baseURL()
+
+	if r.reusability != "" {
+		url += "&reusability=" + r.reusability
+	}
+
+	if r.profile != "" {
+		url += "&profile=" + r.profile
+	}
+
+	if r.rows != "" {
+		url += "&rows=" + r.rows
+	}
+
+	if r.start != "" {
+		url += "&start=" + r.start
+	}
+
+	return url
+}
+
+// NewCursorSearchRequest returns a pointer to a CursorSearchRequest struct. This function will perform error checking
+// for the reusability and profile parameters, but not for cursor. If cursor argument is empty (""),
+// will use start cursor ("*")
+func NewCursorSearchRequest(c *Client, reusability, profile, cursor string) (*CursorSearchRequest, error) {
+	var req *CursorSearchRequest
+
+	if err := checkReusability(reusability); err != nil {
+		return req, err
+	}
+
+	if err := checkProfile(profile); err != nil {
+		return req, err
+	}
+
+	// If no cursor is provided, use start cursor
+	if cursor == "" {
+		cursor = "*"
+	}
+
+	return &CursorSearchRequest{
+		client:      c,
+		reusability: reusability,
+		profile:     profile,
+		cursor:      cursor,
+	}, nil
+}
+
+// Client returns a pointer to the client of said request
+func (r *CursorSearchRequest) Client() *Client {
+	return r.client
+}
+
+func (r *CursorSearchRequest) searchURL() string {
+	url := r.Client().baseURL()
+
+	if r.reusability != "" {
+		url += "&reusability=" + r.reusability
+	}
+
+	if r.profile != "" {
+		url += "&profile=" + r.profile
+	}
+
+	url += "&cursor=" + r.cursor
+
+	return url
 }
 
 // checkReusability will perform input validation for the reusability field
@@ -121,31 +179,6 @@ func checkBasicPagination(check, info string, val int) error {
 		return nil
 	}
 	return nil
-}
-
-// TODO: use URL encode
-
-// searchUrl will use the struct's fields to construct a search URL and return it as string
-func (r *BasicSearchRequest) searchURL() string {
-	url := r.Client.baseURL()
-
-	if r.reusability != "" {
-		url += "&reusability=" + r.reusability
-	}
-
-	if r.profile != "" {
-		url += "&profile=" + r.profile
-	}
-
-	if r.rows != "" {
-		url += "&rows=" + r.rows
-	}
-
-	if r.start != "" {
-		url += "&start=" + r.start
-	}
-
-	return url
 }
 
 // Reusability will set the reusability field or return an error

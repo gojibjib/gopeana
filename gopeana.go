@@ -62,7 +62,7 @@ type Response struct {
 
 // doSearchRequest will perform a Europeana Search API request and return it as a Response struct.
 // This will also close the body.
-func (r *BasicSearchRequest) doSearchRequest(query string) (Response, error) {
+func doSearchRequest(r Request, query string) (Response, error) {
 	var resp Response
 	requestString := r.searchURL() + "&query=" + query
 
@@ -73,7 +73,7 @@ func (r *BasicSearchRequest) doSearchRequest(query string) (Response, error) {
 		return resp, err
 	}
 
-	body, err := r.Client.do(req)
+	body, err := r.Client().do(req)
 	if err != nil {
 		return resp, err
 	}
@@ -90,7 +90,7 @@ func (r *BasicSearchRequest) doSearchRequest(query string) (Response, error) {
 	return resp, nil
 }
 
-// Get returns an Europeana Search API response for the passed query.
-func (r *BasicSearchRequest) Get(query string) (Response, error) {
-	return r.doSearchRequest(query)
+// Get returns an Europeana Search API response for the passed query and request.
+func Get(r Request, query string) (Response, error) {
+	return doSearchRequest(r, query)
 }
