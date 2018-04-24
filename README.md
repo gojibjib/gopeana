@@ -32,7 +32,7 @@ func main() {
 	client := gopeana.NewClient(apiKey, "")
 	   	
 	// Returns all results for 'Mona Lisa' with an open license.
-	request, err := gopeana.NewRequest(client, "open", "standard", "12", "1")
+	request, err := gopeana.NewBasicSearchRequest(client, "open", "standard", "12", "1")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,11 +45,5 @@ func main() {
 	// Web search: https://www.europeana.eu/portal/de/search?q=mona+lisa&f%5BREUSABILITY%5D%5B%5D=open
 	// API search: https://www.europeana.eu/api/v2/search.json?wskey=XXXXX&reusability=open&query=mona+lisa
 	fmt.Println(resp)
-	
-	data, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("Error marshaling JSON")
-	}
-	fmt.Println(string(data))
 }
 ```
