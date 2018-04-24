@@ -2,6 +2,7 @@ package gopeana
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -54,12 +55,14 @@ type Response struct {
 	RequestNumber int    `json:"requestNumber"`
 	ItemsCount    int    `json:"itemsCount"`
 	TotalResults  int    `json:"totalResults"`
+	NextCursor    string `json:"nextCursor"`
+	Error         string `json:"error"`
 	Items         []Item `json:"items"`
 }
 
 // doSearchRequest will perform a Europeana Search API request and return it as a Response struct.
 // This will also close the body.
-func (r *SearchRequest) doSearchRequest(query string) (Response, error) {
+func (r *BasicSearchRequest) doSearchRequest(query string) (Response, error) {
 	var resp Response
 	requestString := r.searchURL() + "&query=" + query
 
@@ -78,6 +81,9 @@ func (r *SearchRequest) doSearchRequest(query string) (Response, error) {
 
 	// Using json.Decoder here since we're reading from a stream
 	if err := json.NewDecoder(body).Decode(&resp); err != nil {
+		if !resp.Success {
+			return resp, fmt.Errorf("%s", resp.Error)
+		}
 		return resp, err
 	}
 
@@ -85,6 +91,6 @@ func (r *SearchRequest) doSearchRequest(query string) (Response, error) {
 }
 
 // Get returns an Europeana Search API response for the passed query.
-func (r *SearchRequest) Get(query string) (Response, error) {
+func (r *BasicSearchRequest) Get(query string) (Response, error) {
 	return r.doSearchRequest(query)
 }

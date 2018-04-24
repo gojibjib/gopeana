@@ -10,7 +10,7 @@ var validProfile = []string{"", "minimal", "standard", "rich"}
 var validRows = []string{"", "0", "1", "12", "24"}
 var validStart = []string{"", "1", "5", "18"}
 
-func assertURL(t *testing.T, c *Client, r *SearchRequest, v, param string) {
+func assertURL(t *testing.T, c *Client, r *BasicSearchRequest, v, param string) {
 	t.Helper()
 
 	got := r.searchURL()
@@ -48,7 +48,7 @@ func TestValidNewRequest(t *testing.T) {
 	}
 
 	for _, tt := range validRequests {
-		if _, err := NewSearchRequest(c, tt.input[0], tt.input[1], tt.input[2], tt.input[3]); err != nil {
+		if _, err := NewBasicSearchRequest(c, tt.input[0], tt.input[1], tt.input[2], tt.input[3]); err != nil {
 			t.Errorf("error while creating new Request: %s", err)
 		}
 	}
@@ -58,7 +58,7 @@ func TestValidSearchURL(t *testing.T) {
 	c := NewClient("abc", "")
 
 	t.Run("Basic URL", func(t *testing.T) {
-		r, err := NewSearchRequest(c, "", "", "", "")
+		r, err := NewBasicSearchRequest(c, "", "", "", "")
 		if err != nil {
 			t.Errorf("%s", err)
 		}
@@ -71,7 +71,7 @@ func TestValidSearchURL(t *testing.T) {
 
 	t.Run("With Reusability", func(t *testing.T) {
 		for _, v := range validReusability {
-			r, err := NewSearchRequest(c, v, "", "", "")
+			r, err := NewBasicSearchRequest(c, v, "", "", "")
 			if err != nil {
 				t.Errorf("%s", err)
 			}
@@ -81,7 +81,7 @@ func TestValidSearchURL(t *testing.T) {
 
 	t.Run("With Profile", func(t *testing.T) {
 		for _, v := range validProfile {
-			r, err := NewSearchRequest(c, "", v, "", "")
+			r, err := NewBasicSearchRequest(c, "", v, "", "")
 			if err != nil {
 				t.Errorf("%s", err)
 			}
@@ -91,7 +91,7 @@ func TestValidSearchURL(t *testing.T) {
 
 	t.Run("With Rows", func(t *testing.T) {
 		for _, v := range validRows {
-			r, err := NewSearchRequest(c, "", "", v, "")
+			r, err := NewBasicSearchRequest(c, "", "", v, "")
 			if err != nil {
 				t.Errorf("%s", err)
 			}
@@ -101,7 +101,7 @@ func TestValidSearchURL(t *testing.T) {
 
 	t.Run("With Start", func(t *testing.T) {
 		for _, v := range validStart {
-			r, err := NewSearchRequest(c, "", "", "", v)
+			r, err := NewBasicSearchRequest(c, "", "", "", v)
 			if err != nil {
 				t.Errorf("%s", err)
 			}
@@ -114,7 +114,7 @@ func TestValidSearchURL(t *testing.T) {
 			for _, p := range validProfile[1:] {
 				for _, ro := range validRows[1:] {
 					for _, s := range validStart[1:] {
-						req, err := NewSearchRequest(c, re, p, ro, s)
+						req, err := NewBasicSearchRequest(c, re, p, ro, s)
 						if err != nil {
 							t.Errorf("%s", err)
 						}
@@ -135,7 +135,7 @@ func TestInvalidNewRequest(t *testing.T) {
 
 	t.Run("Invalid Reusability", func(t *testing.T) {
 		for _, v := range []string{"abcd", "42", "closed", "How are you"} {
-			if _, err := NewSearchRequest(c, v, "", "", ""); err == nil {
+			if _, err := NewBasicSearchRequest(c, v, "", "", ""); err == nil {
 				t.Errorf("error should have been thrown with reusability = %s", v)
 			}
 		}
@@ -143,7 +143,7 @@ func TestInvalidNewRequest(t *testing.T) {
 
 	t.Run("Invalid Profile", func(t *testing.T) {
 		for _, v := range []string{"abcd", "42", "open", "How are you", "open"} {
-			if _, err := NewSearchRequest(c, "", v, "", ""); err == nil {
+			if _, err := NewBasicSearchRequest(c, "", v, "", ""); err == nil {
 				t.Errorf("error should have been thrown with profile = %s", v)
 			}
 		}
@@ -151,7 +151,7 @@ func TestInvalidNewRequest(t *testing.T) {
 
 	t.Run("Invalid Rows", func(t *testing.T) {
 		for _, v := range []string{"-1", "-15", "test", "xkcd", "43.2"} {
-			if _, err := NewSearchRequest(c, "", "", v, ""); err == nil {
+			if _, err := NewBasicSearchRequest(c, "", "", v, ""); err == nil {
 				t.Errorf("error should have been thrown with rows = %s", v)
 			}
 		}
@@ -159,7 +159,7 @@ func TestInvalidNewRequest(t *testing.T) {
 
 	t.Run("Invalid Start", func(t *testing.T) {
 		for _, v := range []string{"0", "-15", "test", "xkcd", "43.2"} {
-			if _, err := NewSearchRequest(c, "", "", "", v); err == nil {
+			if _, err := NewBasicSearchRequest(c, "", "", "", v); err == nil {
 				t.Errorf("error should have been thrown with rows = %s", v)
 			}
 		}
@@ -168,7 +168,7 @@ func TestInvalidNewRequest(t *testing.T) {
 
 func TestFieldChange(t *testing.T) {
 	c := NewClient("abc", "")
-	r, _ := NewSearchRequest(c, "", "", "", "")
+	r, _ := NewBasicSearchRequest(c, "", "", "", "")
 
 	t.Run("Change reusability", func(t *testing.T) {
 		for _, v := range validReusability {

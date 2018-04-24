@@ -7,8 +7,8 @@ Example:
 	client := gopeana.NewClient(apiKey, "")
 
 	// Will fetch results with open license, standard profile, default rows (12), default start (1)
-	// Same as gopeana.NewSearchRequest(client, "open", "", "", "")
-	request, err := gopeana.NewSearchRequest(client, "open", "standard", "12", "1")
+	// Same as gopeana.NewBasicSearchRequest(client, "open", "", "", "")
+	request, err := gopeana.NewBasicSearchRequest(client, "open", "standard", "12", "1")
 	if err != nil {
 		log.Fatal(err)
 	}

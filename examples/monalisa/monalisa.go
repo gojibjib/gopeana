@@ -11,7 +11,7 @@ func main() {
 	apiKey := "XXXX"
 	client := gopeana.NewClient(apiKey, "")
 
-	request, err := gopeana.NewSearchRequest(client, "open", "", "", "")
+	request, err := gopeana.NewBasicSearchRequest(client, "open", "", "", "")
 	if err != nil {
 		log.Fatal(err)
 	}

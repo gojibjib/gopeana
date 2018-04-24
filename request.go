@@ -5,11 +5,11 @@ import (
 	"strconv"
 )
 
-// SearchRequest is a wrapper around an Europeana API Search request, defining fields such
+// BasicSearchRequest is a wrapper around an Europeana API Search request, defining fields such
 // as reusability, profile and rows/start for basic Pagination.
 // You can pass an empty string to rows, profile or start to use the API default values
 // rows = "" will return 12 results, start = "" will start with item 1, profile = "" will use standard profile.
-type SearchRequest struct {
+type BasicSearchRequest struct {
 	*Client
 	reusability string
 	profile     string
@@ -17,10 +17,17 @@ type SearchRequest struct {
 	start       string
 }
 
-// NewSearchRequest returns a pointer to a SearchRequest struct. This function will also perform error checking
+type CursorSearchRequest struct {
+	*Client
+	reusability string
+	profile     string
+	cursor      string
+}
+
+// NewBasicSearchRequest returns a pointer to a BasicSearchRequest struct. This function will also perform error checking
 // and return an error if an invalid value has been provided.
-func NewSearchRequest(c *Client, reusability, profile, rows, start string) (*SearchRequest, error) {
-	var request *SearchRequest
+func NewBasicSearchRequest(c *Client, reusability, profile, rows, start string) (*BasicSearchRequest, error) {
+	var request *BasicSearchRequest
 
 	if err := checkReusability(reusability); err != nil {
 		return request, err
@@ -30,15 +37,15 @@ func NewSearchRequest(c *Client, reusability, profile, rows, start string) (*Sea
 		return request, err
 	}
 
-	if err := checkPagination(rows, "rows can't be < 0", 0); err != nil {
+	if err := checkBasicPagination(rows, "rows can't be < 0", 0); err != nil {
 		return request, err
 	}
 
-	if err := checkPagination(start, "start can't be < 1", 1); err != nil {
+	if err := checkBasicPagination(start, "start can't be < 1", 1); err != nil {
 		return request, err
 	}
 
-	return &SearchRequest{
+	return &BasicSearchRequest{
 		Client:      c,
 		reusability: reusability,
 		profile:     profile,
@@ -71,11 +78,11 @@ func checkProfile(s string) error {
 		s, validProfile)
 }
 
-// checkPagination will will take a string check and try to convert it to an integer.
+// checkBasicPagination will will take a string check and try to convert it to an integer.
 // If conversion fails or the converted value is smaller than a passed integer val,
 // will return a custom error string passed as the info parameter.
 // This function can be used to validate inputs for the rows and start field
-func checkPagination(check, info string, val int) error {
+func checkBasicPagination(check, info string, val int) error {
 	if check != "" {
 		check, err := strconv.Atoi(check)
 		if err != nil {
@@ -90,7 +97,7 @@ func checkPagination(check, info string, val int) error {
 }
 
 // searchUrl will use the struct's fields to construct a search URL and return it as string
-func (r *SearchRequest) searchURL() string {
+func (r *BasicSearchRequest) searchURL() string {
 	url := r.Client.baseURL()
 
 	if r.reusability != "" {
@@ -113,7 +120,7 @@ func (r *SearchRequest) searchURL() string {
 }
 
 // Reusability will set the reusability field or return an error
-func (r *SearchRequest) Reusability(s string) error {
+func (r *BasicSearchRequest) Reusability(s string) error {
 	if err := checkReusability(s); err != nil {
 		return err
 	}
@@ -123,7 +130,7 @@ func (r *SearchRequest) Reusability(s string) error {
 }
 
 // Profile will set the profile field or return an error
-func (r *SearchRequest) Profile(s string) error {
+func (r *BasicSearchRequest) Profile(s string) error {
 	if err := checkProfile(s); err != nil {
 		return err
 	}
@@ -132,8 +139,8 @@ func (r *SearchRequest) Profile(s string) error {
 }
 
 // Rows will set the rows field or return an error
-func (r *SearchRequest) Rows(s string) error {
-	if err := checkPagination(s, "rows can't be < 0", 0); err != nil {
+func (r *BasicSearchRequest) Rows(s string) error {
+	if err := checkBasicPagination(s, "rows can't be < 0", 0); err != nil {
 		return err
 	}
 	r.profile = s
@@ -141,8 +148,8 @@ func (r *SearchRequest) Rows(s string) error {
 }
 
 // Start will set the start field or return an error
-func (r *SearchRequest) Start(s string) error {
-	if err := checkPagination(s, "start can't be < 1", 1); err != nil {
+func (r *BasicSearchRequest) Start(s string) error {
+	if err := checkBasicPagination(s, "start can't be < 1", 1); err != nil {
 		return err
 	}
 	r.profile = s
