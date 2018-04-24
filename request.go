@@ -24,6 +24,33 @@ type CursorSearchRequest struct {
 	cursor      string
 }
 
+// NewCursorSearchRequest returns a pointer to a CursorSearchRequest struct. This function will perform error checking
+// for the reusability and profile parameters, but not for cursor. If cursor argument is empty (""),
+// will use start cursor ("*")
+func NewCursorSearchRequest(c *Client, reusability, profile, cursor string) (*CursorSearchRequest, error) {
+	var req *CursorSearchRequest
+
+	if err := checkReusability(reusability); err != nil {
+		return req, err
+	}
+
+	if err := checkProfile(profile); err != nil {
+		return req, err
+	}
+
+	//
+	if cursor == "" {
+		cursor = "*"
+	}
+
+	return &CursorSearchRequest{
+		Client:      c,
+		reusability: reusability,
+		profile:     profile,
+		cursor:      cursor,
+	}, nil
+}
+
 // NewBasicSearchRequest returns a pointer to a BasicSearchRequest struct. This function will also perform error checking
 // and return an error if an invalid value has been provided.
 func NewBasicSearchRequest(c *Client, reusability, profile, rows, start string) (*BasicSearchRequest, error) {
@@ -95,6 +122,8 @@ func checkBasicPagination(check, info string, val int) error {
 	}
 	return nil
 }
+
+// TODO: use URL encode
 
 // searchUrl will use the struct's fields to construct a search URL and return it as string
 func (r *BasicSearchRequest) searchURL() string {

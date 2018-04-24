@@ -9,6 +9,38 @@ var validReusability = []string{"", "open", "restricted", "permission"}
 var validProfile = []string{"", "minimal", "standard", "rich"}
 var validRows = []string{"", "0", "1", "12", "24"}
 var validStart = []string{"", "1", "5", "18"}
+var valiBasicRequests = []struct {
+	input []string
+	want  error
+}{
+	{[]string{"", "", "", ""}, nil},
+	{[]string{"open", "", "", ""}, nil},
+	{[]string{"restricted", "", "", ""}, nil},
+	{[]string{"permission", "", "", ""}, nil},
+	{[]string{"", "minimal", "", ""}, nil},
+	{[]string{"", "standard", "", ""}, nil},
+	{[]string{"", "rich", "", ""}, nil},
+	{[]string{"", "", "0", "1"}, nil},
+	{[]string{"", "", "12", "2"}, nil},
+	{[]string{"open", "minimal", "12", "2"}, nil},
+}
+var validCursorRequests = []struct {
+	input []string
+	want  []error
+}{
+	{[]string{"", "", ""}, nil},
+	{[]string{"", "", "*"}, nil},
+	{[]string{"", "", "1235"}, nil},
+	{[]string{"", "", "asp[el1230d"}, nil},
+	{[]string{"", "", ""}, nil},
+	{[]string{"open", "", ""}, nil},
+	{[]string{"restricted", "", ""}, nil},
+	{[]string{"permission", "", ""}, nil},
+	{[]string{"", "minimal", ""}, nil},
+	{[]string{"", "standard", ""}, nil},
+	{[]string{"", "rich", ""}, nil},
+	{[]string{"open", "minimal", "*"}, nil},
+}
 
 func assertURL(t *testing.T, c *Client, r *BasicSearchRequest, v, param string) {
 	t.Helper()
@@ -27,31 +59,23 @@ func assertURL(t *testing.T, c *Client, r *BasicSearchRequest, v, param string) 
 
 func TestValidNewRequest(t *testing.T) {
 	c := NewClient("abc", "")
-	var validRequests = []struct {
-		// 0 reusability
-		// 1 profile
-		// 2 rows
-		// 3 start
-		input []string
-		want  error
-	}{
-		{[]string{"", "", "", ""}, nil},
-		{[]string{"open", "", "", ""}, nil},
-		{[]string{"restricted", "", "", ""}, nil},
-		{[]string{"permission", "", "", ""}, nil},
-		{[]string{"", "minimal", "", ""}, nil},
-		{[]string{"", "standard", "", ""}, nil},
-		{[]string{"", "rich", "", ""}, nil},
-		{[]string{"", "", "0", "1"}, nil},
-		{[]string{"", "", "12", "2"}, nil},
-		{[]string{"open", "minimal", "12", "2"}, nil},
-	}
 
-	for _, tt := range validRequests {
-		if _, err := NewBasicSearchRequest(c, tt.input[0], tt.input[1], tt.input[2], tt.input[3]); err != nil {
-			t.Errorf("error while creating new Request: %s", err)
+	t.Run("New BasicSearchRequest", func(t *testing.T) {
+		for _, tt := range valiBasicRequests {
+			if _, err := NewBasicSearchRequest(c, tt.input[0], tt.input[1], tt.input[2], tt.input[3]); err != nil {
+				t.Errorf("error while creating new Request: %s", err)
+			}
 		}
-	}
+	})
+
+	t.Run("New CursorSearchRequest", func(t *testing.T) {
+		for _, tt := range validCursorRequests {
+			if _, err := NewCursorSearchRequest(c, tt.input[0], tt.input[1], tt.input[2]); err != nil {
+				t.Errorf("error while creating new Request: %s", err)
+			}
+		}
+	})
+
 }
 
 func TestValidSearchURL(t *testing.T) {
