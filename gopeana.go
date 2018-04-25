@@ -3,7 +3,6 @@ package gopeana
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -66,7 +65,7 @@ func doSearchRequest(r Request, query string) (Response, error) {
 	var resp Response
 	requestString := r.searchURL() + "&query=" + query
 
-	log.Printf("Sending: GET %s", requestString)
+	//log.Printf("Sending: GET %s", requestString)
 
 	req, err := http.NewRequest("GET", requestString, nil)
 	if err != nil {
@@ -74,10 +73,10 @@ func doSearchRequest(r Request, query string) (Response, error) {
 	}
 
 	body, err := r.Client().do(req)
+	defer body.Close()
 	if err != nil {
 		return resp, err
 	}
-	defer body.Close()
 
 	// Using json.Decoder here since we're reading from a stream
 	if err := json.NewDecoder(body).Decode(&resp); err != nil {

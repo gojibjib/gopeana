@@ -161,6 +161,7 @@ func (r *CursorSearchRequest) Client() *Client {
 	return r.client
 }
 
+// TODO: Escape URL
 func (r *CursorSearchRequest) searchURL() string {
 	url := r.Client().baseURL()
 
@@ -194,6 +195,16 @@ func (r *CursorSearchRequest) Profile(s string) error {
 	}
 	r.profile = s
 	return nil
+}
+
+// Cursor will set the cursor field
+func (r *CursorSearchRequest) Cursor(s string) {
+	// TODO: URL escape
+	if s == "" {
+		s = "*"
+	}
+
+	r.cursor = s
 }
 
 // checkReusability will perform input validation for the reusability field

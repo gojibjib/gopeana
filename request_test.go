@@ -79,6 +79,32 @@ func TestValidNewRequest(t *testing.T) {
 
 }
 
+func TestClientFunction(t *testing.T) {
+	c := NewClient("abc", "")
+
+	t.Run("BasicSearchRequest.Client()", func(t *testing.T) {
+		r, err := NewBasicSearchRequest(c, "", "", "", "")
+		if err != nil {
+			t.Error(err)
+		}
+
+		if r.Client() != c {
+			t.Errorf("r.Client(): got %v, want %v", r.Client(), c)
+		}
+	})
+
+	t.Run("CursorSearchRequest.Client()", func(t *testing.T) {
+		r, err := NewCursorSearchRequest(c, "", "", "")
+		if err != nil {
+			t.Error(err)
+		}
+
+		if r.Client() != c {
+			t.Errorf("r.Client(): got %v, want %v", r.Client(), c)
+		}
+	})
+}
+
 func TestValidBasicSearchURL(t *testing.T) {
 	c := NewClient("abc", "")
 
@@ -406,6 +432,21 @@ func TestFieldChangeCursorSearchRequest(t *testing.T) {
 
 			if r.profile == v {
 				t.Errorf("r.Profile(%s): got %s, want %s", v, r.profile, "")
+			}
+		}
+	})
+
+	t.Run("Change Cursor", func(t *testing.T) {
+		for i, v := range validCursor {
+			r.Cursor(v)
+			if i == 0 {
+				if r.cursor != "*" {
+					t.Errorf("r.Cursor(%s): got %s, want %s", v, r.cursor, "*")
+				}
+			} else {
+				if r.cursor != v {
+					t.Errorf("r.Cursor(%s): got %s, want %s", v, r.cursor, v)
+				}
 			}
 		}
 	})
