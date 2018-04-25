@@ -7,7 +7,7 @@ import (
 
 var apiKey = os.Getenv("APIKEY")
 
-func TestGetApiKey(t *testing.T) {
+func TestApiKey(t *testing.T) {
 	if apiKey == "" {
 		t.Errorf("APIKEY is empty")
 	}

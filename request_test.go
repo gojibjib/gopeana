@@ -279,7 +279,7 @@ func TestInvalidNewCursorSearchRequest(t *testing.T) {
 	})
 }
 
-func TestFieldChange(t *testing.T) {
+func TestFieldChangeBasicSearchRequest(t *testing.T) {
 	c := NewClient("abc", "")
 	r, _ := NewBasicSearchRequest(c, "", "", "", "")
 
@@ -288,11 +288,18 @@ func TestFieldChange(t *testing.T) {
 			if err := r.Reusability(v); err != nil {
 				t.Errorf("%s", err)
 			}
+			if r.reusability != v {
+				t.Errorf("r.Reusability(%s): got %s, want %s", v, r.reusability, v)
+			}
 		}
 
 		for _, v := range []string{"abc", "0123", "-15", "opent"} {
 			if err := r.Reusability(v); err == nil {
 				t.Errorf("err shouldn't be nil with r.Reusability(%s)", v)
+			}
+
+			if r.reusability == v {
+				t.Errorf("r.Reusability(%s): got %s, want %s", v, r.reusability, "")
 			}
 		}
 	})
@@ -302,11 +309,19 @@ func TestFieldChange(t *testing.T) {
 			if err := r.Profile(v); err != nil {
 				t.Errorf("%s", err)
 			}
+
+			if r.profile != v {
+				t.Errorf("r.Profile(%s): got %s, want %s", v, r.profile, v)
+			}
 		}
 
 		for _, v := range []string{"abc", "0123", "-15", "standart"} {
 			if err := r.Profile(v); err == nil {
 				t.Errorf("err shouldn't be nil with r.Profile(%s)", v)
+			}
+
+			if r.profile == v {
+				t.Errorf("r.Profile(%s): got %s, want %s", v, r.profile, "")
 			}
 		}
 	})
@@ -316,11 +331,18 @@ func TestFieldChange(t *testing.T) {
 			if err := r.Rows(v); err != nil {
 				t.Errorf("%s", err)
 			}
+			if r.rows != v {
+				t.Errorf("r.Rows(%s): got %s, want %s", v, r.rows, "")
+			}
 		}
 
 		for _, v := range []string{"-20", "3.14", "test", "-1"} {
 			if err := r.Rows(v); err == nil {
 				t.Errorf("err shouldn't be nil with r.Rows(%s)", v)
+			}
+
+			if r.rows == v {
+				t.Errorf("r.Rows(%s): got %s, want %s", v, r.rows, "")
 			}
 		}
 	})
@@ -330,11 +352,60 @@ func TestFieldChange(t *testing.T) {
 			if err := r.Start(v); err != nil {
 				t.Errorf("%s", err)
 			}
+
+			if r.start != v {
+				t.Errorf("r.Start(%s): got %s, want %s", v, r.start, v)
+			}
 		}
 
 		for _, v := range []string{"-20", "3.14", "test", "0"} {
 			if err := r.Start(v); err == nil {
 				t.Errorf("err shouldn't be nil with r.Start(%s)", v)
+			}
+
+			if r.start == v {
+				t.Errorf("r.Start(%s): got %s, want %s", v, r.start, "")
+			}
+		}
+	})
+}
+
+func TestFieldChangeCursorSearchRequest(t *testing.T) {
+	c := NewClient("abc", "")
+	r, _ := NewCursorSearchRequest(c, "", "", "")
+
+	t.Run("Change Reusability", func(t *testing.T) {
+		for _, v := range validReusability {
+			if err := r.Reusability(v); err != nil {
+				t.Error(err)
+			}
+		}
+
+		for _, v := range []string{"abc", "0123", "-15", "opent"} {
+			if err := r.Reusability(v); err == nil {
+				t.Errorf("err shouldn't be nil with r.Reusability(%s)", v)
+			}
+
+			if r.reusability == v {
+				t.Errorf("r.Reusability(%s): got %s, want %s", v, r.reusability, "")
+			}
+		}
+	})
+
+	t.Run("Change Profile", func(t *testing.T) {
+		for _, v := range validProfile {
+			if err := r.Profile(v); err != nil {
+				t.Error(err)
+			}
+		}
+
+		for _, v := range []string{"abc", "0123", "-15", "standart"} {
+			if err := r.Profile(v); err == nil {
+				t.Errorf("err shouldn't be nil with r.Profile(%s)", v)
+			}
+
+			if r.profile == v {
+				t.Errorf("r.Profile(%s): got %s, want %s", v, r.profile, "")
 			}
 		}
 	})

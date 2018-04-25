@@ -91,6 +91,44 @@ func (r *BasicSearchRequest) searchURL() string {
 	return url
 }
 
+// Reusability will set the reusability field or return an error
+func (r *BasicSearchRequest) Reusability(s string) error {
+	if err := checkReusability(s); err != nil {
+		return err
+	}
+
+	r.reusability = s
+	return nil
+}
+
+// Profile will set the profile field or return an error
+func (r *BasicSearchRequest) Profile(s string) error {
+	if err := checkProfile(s); err != nil {
+		return err
+	}
+	r.profile = s
+	return nil
+}
+
+// Rows will set the rows field or return an error
+func (r *BasicSearchRequest) Rows(s string) error {
+	if err := checkBasicPagination(s, "rows can't be < 0", 0); err != nil {
+		return err
+	}
+	r.rows = s
+	return nil
+}
+
+// Start will set the start field or return an error
+func (r *BasicSearchRequest) Start(s string) error {
+	if err := checkBasicPagination(s, "start can't be < 1", 1); err != nil {
+		return err
+	}
+	r.start = s
+	return nil
+
+}
+
 // NewCursorSearchRequest returns a pointer to a CursorSearchRequest struct. This function will perform error checking
 // for the reusability and profile parameters, but not for cursor. If cursor argument is empty (""),
 // will use start cursor ("*")
@@ -139,6 +177,25 @@ func (r *CursorSearchRequest) searchURL() string {
 	return url
 }
 
+// Reusability will set the reusability field or return an error
+func (r *CursorSearchRequest) Reusability(s string) error {
+	if err := checkReusability(s); err != nil {
+		return err
+	}
+
+	r.reusability = s
+	return nil
+}
+
+// Profile will set the profile field or return an error
+func (r *CursorSearchRequest) Profile(s string) error {
+	if err := checkProfile(s); err != nil {
+		return err
+	}
+	r.profile = s
+	return nil
+}
+
 // checkReusability will perform input validation for the reusability field
 func checkReusability(s string) error {
 	validReusability := []string{"", "open", "restricted", "permission"}
@@ -179,42 +236,4 @@ func checkBasicPagination(check, info string, val int) error {
 		return nil
 	}
 	return nil
-}
-
-// Reusability will set the reusability field or return an error
-func (r *BasicSearchRequest) Reusability(s string) error {
-	if err := checkReusability(s); err != nil {
-		return err
-	}
-
-	r.reusability = s
-	return nil
-}
-
-// Profile will set the profile field or return an error
-func (r *BasicSearchRequest) Profile(s string) error {
-	if err := checkProfile(s); err != nil {
-		return err
-	}
-	r.profile = s
-	return nil
-}
-
-// Rows will set the rows field or return an error
-func (r *BasicSearchRequest) Rows(s string) error {
-	if err := checkBasicPagination(s, "rows can't be < 0", 0); err != nil {
-		return err
-	}
-	r.profile = s
-	return nil
-}
-
-// Start will set the start field or return an error
-func (r *BasicSearchRequest) Start(s string) error {
-	if err := checkBasicPagination(s, "start can't be < 1", 1); err != nil {
-		return err
-	}
-	r.profile = s
-	return nil
-
 }
