@@ -2,12 +2,14 @@ package gopeana
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 )
 
 // Request defines each type that implements the Client and searchURL functions
 type Request interface {
 	searchURL() string
+	EscapedURL() string
 	Client() *Client
 }
 
@@ -91,6 +93,10 @@ func (r *BasicSearchRequest) searchURL() string {
 	return url
 }
 
+func (r *BasicSearchRequest) EscapedURL() string {
+	return url.QueryEscape(r.searchURL())
+}
+
 // Reusability will set the reusability field or return an error
 func (r *BasicSearchRequest) Reusability(s string) error {
 	if err := checkReusability(s); err != nil {
@@ -161,7 +167,6 @@ func (r *CursorSearchRequest) Client() *Client {
 	return r.client
 }
 
-// TODO: Escape URL
 func (r *CursorSearchRequest) searchURL() string {
 	url := r.Client().baseURL()
 
@@ -176,6 +181,10 @@ func (r *CursorSearchRequest) searchURL() string {
 	url += "&cursor=" + r.cursor
 
 	return url
+}
+
+func (r *CursorSearchRequest) EscapedURL() string {
+	return url.QueryEscape(r.searchURL())
 }
 
 // Reusability will set the reusability field or return an error

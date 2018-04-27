@@ -451,3 +451,31 @@ func TestFieldChangeCursorSearchRequest(t *testing.T) {
 		}
 	})
 }
+
+func TestEscapedURL(t *testing.T) {
+	c := NewClient("abc", "")
+
+	t.Run("Basic Search Request", func(t *testing.T) {
+		req, err := NewBasicSearchRequest(c, "open", "standard", "12", "2")
+		if err != nil {
+			t.Error(err)
+		}
+		got := req.EscapedURL()
+		want := "https%3A%2F%2Fwww.europeana.eu%2Fapi%2Fv2%2Fsearch.json%3Fwskey%3Dabc%26reusability%3Dopen%26profile%3Dstandard%26rows%3D12%26start%3D2"
+		if got != want {
+			t.Errorf("req.EscapedURL(): got %s, want %s", got, want)
+		}
+	})
+
+	t.Run("Cursor Search Request", func(t *testing.T) {
+		req, err := NewCursorSearchRequest(c, "open", "standard", "*")
+		if err != nil {
+			t.Error(err)
+		}
+		got := req.EscapedURL()
+		want := "https%3A%2F%2Fwww.europeana.eu%2Fapi%2Fv2%2Fsearch.json%3Fwskey%3Dabc%26reusability%3Dopen%26profile%3Dstandard%26cursor%3D%2A"
+		if got != want {
+			t.Errorf("req.EscapedURL(): got %s, want %s", got, want)
+		}
+	})
+}
